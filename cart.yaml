@@ -1,5 +1,5 @@
 - name: configure cart server 
-  host: cart 
+  hosts: cart 
   become: yes 
   task:
   - name: disable latest version and enable old version 
@@ -25,7 +25,7 @@
 
   - name: download the cart code 
     ansible.builtin.get_url:
-      src: https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip
+      url: https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip
       dest: /tmp/cart.zip 
 
   - name: unzip the cart code
