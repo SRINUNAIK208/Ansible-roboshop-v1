@@ -1,5 +1,5 @@
 - name: configure redis server 
-  host: redis 
+  hosts: redis 
   become: yes 
   tasks:
   - name: disable latest version and enable version 7 
