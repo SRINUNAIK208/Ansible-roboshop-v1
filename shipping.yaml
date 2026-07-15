@@ -1,0 +1,77 @@
+- name: configure the shipping server 
+  hosts: shipping 
+  become: yes 
+  tasks:
+  - name: install maven 
+    ansible.builtin.dnf:
+      name: maven
+      state: installed 
+
+  - name: create working directory 
+    ansible.builtin.file:
+      path: /app 
+      state: directory 
+
+  - name: create system user 
+    ansible.builtin.user:
+      name: roboshop
+      system: true 
+      home: /app 
+      shell: /sbin/nologin 
+
+  - name: download the shipping the code 
+    ansible.builtin.get_url:
+      url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
+      dest: /tmp/shipping.zip 
+
+  - name: unzip the shipping the code 
+    ansible.builtin.unarchive:
+      src: /tmp/shipping.zip 
+      dest: /app 
+      remote_src: yes 
+
+  - name: install dependencies
+    ansible.builtin.command: mvn clean package  
+    args:
+      chdir: /app 
+
+  - name: move the target from one place to another place 
+    ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar 
+    args:
+      chdir: /app 
+
+  - name: connect with remote server
+    ansible.builtin.copy:
+      src: shipping.service
+      dest: /etc/systemd/system/shipping.service 
+
+  - name: systemctl daemon_reload 
+    ansible.builtin.systemd_service:
+       daemon_reload: true 
+
+  - name: start and enable the shipping server 
+    ansible.builtin.service:
+      name: shipping
+      state: started 
+      enabled: yes 
+
+  - name: install mysql client 
+    ansible.builtin.dnf:
+      name: mysql 
+      state: present 
+
+  - name: load the data from schema
+    ansible.builtin.shell: mysql -h mysql.srinunayak.online -uroot -pRoboShop@1 < /app/db/schema.sql
+
+  - name: load the data from schema
+    ansible.builtin.shell: mysql -h mysql.srinunayak.online -uroot -pRoboShop@1 < /app/db/app-user.sql
+
+  - name: load the data from schema
+    ansible.builtin.shell: mysql -h mysql.srinunayak.online -uroot -pRoboShop@1 < /app/db/master-data.sql
+
+  - name: restart the shipping server 
+    ansible.builtin.service:
+      name: shipping
+      state: restarted
+
+    
