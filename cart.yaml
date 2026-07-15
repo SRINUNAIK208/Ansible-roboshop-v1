@@ -1,7 +1,7 @@
 - name: configure cart server 
   hosts: cart 
   become: yes 
-  task:
+  tasks:
   - name: disable latest version and enable old version 
     ansible.builtin.command: dnf module disable nodejs -y
     ansible.builtin.command: dnf module enable nodejs:20 -y
