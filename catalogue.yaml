@@ -65,4 +65,4 @@
       state: present 
 
   - name: load the master data from database 
-    ansible.builtin.shell: mongosh --host mongodb.srinuyak.online </app/db/master-data.js
+    ansible.builtin.shell: mongosh --host mongodb.srinunayak.online </app/db/master-data.js
